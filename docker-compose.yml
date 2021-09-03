@@ -1,0 +1,29 @@
+
+version: '3.8'
+
+services:
+  web:
+    build: ./app
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python manage.py runserver 0.0.0.0:8000'
+    volumes:
+      - ./app:/app
+    ports:
+      - 8008:8000
+    environment:
+      - DEBUG=1
+      - DATABASE_URL=postgresql://django_axede:django_axede@db:5432/django_axede
+    depends_on:
+      - db
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=django_axede
+      - POSTGRES_PASSWORD=django_axede
+      - POSTGRES_DB=django_axede
+
+volumes:
+  postgres_data:
